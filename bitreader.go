@@ -17,6 +17,10 @@ func New(data []byte) *Bitreader {
 	}
 }
 
+func (b *Bitreader) Append(data []byte) {
+	b.data = append(b.data, data...)
+}
+
 func (b *Bitreader) ReadBit() (uint8, error) {
 
 	if int(b.byteIndex) >= len(b.data) {
@@ -29,6 +33,11 @@ func (b *Bitreader) ReadBit() (uint8, error) {
 		b.bitIndex = 0
 	}
 	return result, nil
+}
+
+func (b *Bitreader) ReadFlag() (bool, error) {
+	v, err := b.ReadBit()
+	return v == 1, err
 }
 
 func (b *Bitreader) ReadBits(count int) (uint64, error) {
@@ -86,6 +95,25 @@ func (b *Bitreader) ReadInt32() (int32, error) {
 func (b *Bitreader) ReadInt64() (int64, error) {
 	v, err := b.ReadUint64()
 	return int64(v), err
+}
+
+func (b *Bitreader) CurrentIndex() int {
+	return int(b.byteIndex)*8 + int(b.bitIndex)
+}
+
+func (b *Bitreader) Reverse(count int) error {
+	if count > b.CurrentIndex() {
+		return errors.New("index reached < 0")
+	}
+	for i := 0; i < count; i++ {
+		if b.bitIndex == 0 {
+			b.bitIndex = 7
+			b.byteIndex = b.byteIndex - 1
+		} else {
+			b.bitIndex = b.bitIndex - 1
+		}
+	}
+	return nil
 }
 
 // ReadUev reads unsigned exp-golomb codes
