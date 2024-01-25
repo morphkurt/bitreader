@@ -5,29 +5,29 @@ import (
 	"errors"
 )
 
-type Bitreader struct {
+type BitReader struct {
 	data      []byte
 	byteIndex uint64
 	bitIndex  uint8
 }
 
-func New(data []byte) *Bitreader {
-	return &Bitreader{
+func New(data []byte) *BitReader {
+	return &BitReader{
 		data: data,
 	}
 }
 
-func (b *Bitreader) Append(data []byte) {
+func (b *BitReader) Append(data []byte) {
 	b.data = append(b.data, data...)
 }
 
 // Trims the underlying slice by removing the read bytes
-func (b *Bitreader) Trim() {
+func (b *BitReader) Trim() {
 	b.data = b.data[b.byteIndex:]
 	b.byteIndex = 0
 }
 
-func (b *Bitreader) ReadBit() (uint8, error) {
+func (b *BitReader) ReadBit() (uint8, error) {
 
 	if int(b.byteIndex) >= len(b.data) {
 		return 0, errors.New("read exceeds the given byte array")
@@ -41,12 +41,12 @@ func (b *Bitreader) ReadBit() (uint8, error) {
 	return result, nil
 }
 
-func (b *Bitreader) ReadFlag() (bool, error) {
+func (b *BitReader) ReadFlag() (bool, error) {
 	v, err := b.ReadBit()
 	return v == 1, err
 }
 
-func (b *Bitreader) ReadBits(count int) (uint64, error) {
+func (b *BitReader) ReadBits(count int) (uint64, error) {
 	result := uint64(0)
 	for i := 0; i < count; i++ {
 		v, err := b.ReadBit()
@@ -58,56 +58,56 @@ func (b *Bitreader) ReadBits(count int) (uint64, error) {
 	return result, nil
 }
 
-func (b *Bitreader) ReadUint8() (uint8, error) {
+func (b *BitReader) ReadUint8() (uint8, error) {
 	v, err := b.ReadBits(8)
 	return uint8(v), err
 }
 
-func (b *Bitreader) ReadUint16() (uint16, error) {
+func (b *BitReader) ReadUint16() (uint16, error) {
 	v, err := b.ReadBits(16)
 	return uint16(v), err
 }
 
-func (b *Bitreader) ReadUint32() (uint32, error) {
+func (b *BitReader) ReadUint32() (uint32, error) {
 	v, err := b.ReadBits(32)
 	return uint32(v), err
 }
 
-func (b *Bitreader) ReadUint64() (uint64, error) {
+func (b *BitReader) ReadUint64() (uint64, error) {
 	v, err := b.ReadBits(64)
 	return uint64(v), err
 }
 
-func (b *Bitreader) Skip(bits int) error {
+func (b *BitReader) Skip(bits int) error {
 	_, err := b.ReadBits(bits)
 	return err
 }
 
-func (b *Bitreader) ReadInt8() (int8, error) {
+func (b *BitReader) ReadInt8() (int8, error) {
 	v, err := b.ReadUint8()
 	return int8(v), err
 }
 
-func (b *Bitreader) ReadInt16() (int16, error) {
+func (b *BitReader) ReadInt16() (int16, error) {
 	v, err := b.ReadUint16()
 	return int16(v), err
 }
 
-func (b *Bitreader) ReadInt32() (int32, error) {
+func (b *BitReader) ReadInt32() (int32, error) {
 	v, err := b.ReadUint32()
 	return int32(v), err
 }
 
-func (b *Bitreader) ReadInt64() (int64, error) {
+func (b *BitReader) ReadInt64() (int64, error) {
 	v, err := b.ReadUint64()
 	return int64(v), err
 }
 
-func (b *Bitreader) CurrentIndex() int {
+func (b *BitReader) CurrentIndex() int {
 	return int(b.byteIndex)*8 + int(b.bitIndex)
 }
 
-func (b *Bitreader) Reverse(count int) error {
+func (b *BitReader) Reverse(count int) error {
 	if count > b.CurrentIndex() {
 		return errors.New("index reached < 0")
 	}
@@ -123,7 +123,7 @@ func (b *Bitreader) Reverse(count int) error {
 }
 
 // ReadUev reads unsigned exp-golomb codes
-func (reader *Bitreader) ReadUev() (uint64, error) {
+func (reader *BitReader) ReadUev() (uint64, error) {
 	countZero := 0
 	for true {
 		v, err := reader.ReadBit()
@@ -143,7 +143,7 @@ func (reader *Bitreader) ReadUev() (uint64, error) {
 }
 
 // ReadEv reads signed exp-golomb codes
-func (reader *Bitreader) ReadEv() (int64, error) {
+func (reader *BitReader) ReadEv() (int64, error) {
 	v, err := reader.ReadUev()
 	if err != nil {
 		return 0, err
