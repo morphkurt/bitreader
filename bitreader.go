@@ -21,6 +21,12 @@ func (b *Bitreader) Append(data []byte) {
 	b.data = append(b.data, data...)
 }
 
+// Trims the underlying slice by removing the read bytes
+func (b *Bitreader) Trim() {
+	b.data = b.data[b.byteIndex:]
+	b.byteIndex = 0
+}
+
 func (b *Bitreader) ReadBit() (uint8, error) {
 
 	if int(b.byteIndex) >= len(b.data) {

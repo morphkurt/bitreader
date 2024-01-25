@@ -24,6 +24,16 @@ func TestAppendData(t *testing.T) {
 	assert.Equal(t, expected, r)
 }
 
+func TestTrim(t *testing.T) {
+	data := []byte{0xfa, 0x0a, 0x9b}
+	br := New(data)
+	br.Skip(9)
+	br.Trim()
+	expectedIndex := 1
+	actualIndex := br.CurrentIndex()
+	assert.Equal(t, expectedIndex, actualIndex)
+}
+
 func TestIncorrectUevRead(t *testing.T) {
 	data := []byte{0x00, 0x0f}
 	expectedError := "read exceeds the given byte array"
