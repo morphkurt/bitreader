@@ -27,3 +27,4 @@ The following types are allowed
 
 1. Allows to read signed and unsigned Exp-Golomb codes through `ReadUev()` and `ReadEv()` functions
 2. Allows to Skip Bits via `Skip(bits int)`
+3. Allows appending to the backing byte array with `Append(data []byte)`
